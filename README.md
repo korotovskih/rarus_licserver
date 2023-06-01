@@ -3,5 +3,5 @@
 По умолчанию сервер лицензирования использует порт 15200 для лицензирования и 15201 для веб-сервера управления.
 
 ```
-docker run korotovskih/rarus-licserver
+docker run -p 15200:15200 -p 15201:15201 korotovskih/rarus-licserver
 ```
