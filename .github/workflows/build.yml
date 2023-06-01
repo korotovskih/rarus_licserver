@@ -1,0 +1,41 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - master
+      - main
+
+jobs:
+  build:
+    name: build ${{ matrix.version }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - version: "2.0.19.457"
+            uri: "https://rarus.ru/downloads/2553/licserver_2.0.19.457_amd64.deb"
+          - version: "latest"
+            uri: "https://rarus.ru/downloads/2553/licserver_2.0.19.457_amd64.deb"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/rarus-licserver:${{ matrix.version }}
+          build-args: |
+            LICSERVER_URI=${{ matrix.uri }}
+
